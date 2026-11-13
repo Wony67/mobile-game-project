@@ -18,7 +18,7 @@ npm run build   # TypeScript 검사 후 dist/ 생성
 npm run preview # 프로덕션 산출물 확인, 기본 포트 4173
 ```
 
-`dist/`는 정적 호스팅할 수 있습니다. 상대 경로(`base: './'`)를 사용해 추후 Android WebView/Capacitor 패키징을 고려했습니다. APK 패키징과 Android SDK 설정은 아직 구현하지 않았습니다.
+`dist/`는 정적 호스팅할 수 있습니다. GitHub Pages 저장소 경로에 맞춰 `base: '/mobile-game-project/'`를 사용합니다. 추후 Android WebView/Capacitor 패키징 시 해당 빌드의 base를 별도로 조정해야 합니다. APK 패키징과 Android SDK 설정은 아직 구현하지 않았습니다.
 
 ## 조작
 
@@ -64,3 +64,19 @@ Phaser 엔진을 포함한 단일 JS 번들 때문에 Vite의 500kB 청크 경�
 - 클라우드 소프트웨어 WebGL에서는 낮은 프레임 속도로 시간 기반 검사 4개가 실패했습니다. Canvas 재검사는 모두 통과했으며 실제 GPU의 WebGL 성능은 미검증입니다.
 - 실제 모바일 터치·멀티터치, Android APK와 기기별 성능은 미검증입니다. 모바일 너비의 브라우저 포인터 조작은 통과했습니다.
 - `npm run preview -- --port 4173 --strictPort`: 프로덕션 HTTP 200, 960×540 Canvas 생성, 브라우저 오류·리소스 실패 없음, 개발용 검사 도우미 제거 확인.
+
+## GitHub Pages 배포
+
+`.github/workflows/deploy-pages.yml`은 `work` 브랜치로 push할 때 빌드하고 `dist/`를 GitHub Pages에 배포합니다. Node.js 24와 `npm ci`를 사용하며 `main`에는 배포하지 않습니다. 수동 실행도 `work` ref에서만 동작합니다. 별도의 개인 토큰이나 API 키를 저장할 필요가 없습니다.
+
+저장소 관리자가 한 번 설정해야 하는 항목:
+
+1. GitHub 저장소 **Settings → Pages → Build and deployment → Source**를 **GitHub Actions**로 선택합니다.
+2. **Settings → Environments → github-pages**에 배포 브랜치 제한이 있다면 `work`를 허용합니다. 필수 리뷰어가 있다면 실행 시 배포를 승인해야 합니다.
+3. **Actions → Deploy work to GitHub Pages** 실행을 확인합니다. 첫 push 전에 Pages가 활성화되지 않아 실패했다면 설정 후 실패한 실행을 재실행합니다. 워크플로가 기본 브랜치에 없어 수동 실행 버튼이 보이지 않으면 `work`에 새 커밋을 push해 실행할 수 있습니다.
+
+배포 성공 시 주소: `https://Wony67.github.io/mobile-game-project/`
+
+위 주소는 예상 배포 주소이며, 실제 성공 여부는 Actions의 `deploy` 작업과 Settings → Pages에 표시된 상태로 확인해야 합니다. GitHub 플랜 및 저장소 공개 범위에 따라 Pages 사용이 제한될 수 있습니다. Actions 사용이 조직 정책으로 제한되어 있다면 저장소 관리자가 위 워크플로의 공식 `actions/*` 액션을 허용해야 합니다.
+
+배포 후에는 서버를 켜두지 않아도 정적 파일이 GitHub Pages에서 제공됩니다. PC와 스마트폰 브라우저에서 같은 주소로 접속할 수 있습니다. 배포마다 브라우저 캐시로 이전 버전이 보일 경우 새로고침하세요.
